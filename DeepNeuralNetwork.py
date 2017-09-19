@@ -60,6 +60,8 @@ class DeepNeuralNetwork:
             self.init = tf.global_variables_initializer()
             self.init_local = tf.local_variables_initializer()
 
+            self.saver = tf.train.Saver()
+
     def init_variables(self, session):
         session.run(self.init)
         session.run(self.init_local)
@@ -78,3 +80,10 @@ class DeepNeuralNetwork:
         _, loss = sess.run([self.train_op, self.loss_op], feed_dict={
             self.inputs: batch_examples, self.labels: batch_labels})
         return loss
+
+    def save_model(self, session, filename):
+        self.saver.save(session, filename)
+
+    def restore_model(self, session, model_root, filename):
+        self.saver = tf.train.import_meta_graph(filename)
+        self.saver.restore(session, tf.train.latest_checkpoint(model_root))
