@@ -43,7 +43,7 @@ class AutoEncoder:
                 bias = tf.Variable(tf.random_normal([self.layers_conf[i]]))
                 self.layers_matrix.append(mat)
                 self.biases_matrix.append(bias)
-                prob = tf.nn.relu(
+                prob = tf.nn.sigmoid(
                     tf.add(tf.matmul(self._layers_outputs[-1], mat), bias))
                 self._layers_outputs.append(prob)
 
@@ -52,12 +52,12 @@ class AutoEncoder:
             for i in range(code_layer_idx + 1):
                 mat = self.layers_matrix[code_layer_idx - i]
                 bias = self.biases_matrix[code_layer_idx - i - 1]
-                prob = tf.nn.relu(
+                prob = tf.nn.sigmoid(
                     tf.add(tf.matmul(self._layers_outputs[-1], tf.transpose(mat)), bias))
                 self._layers_outputs.append(prob)
 
                 # For decode only purpose
-                prob = tf.nn.relu(
+                prob = tf.nn.sigmoid(
                     tf.add(tf.matmul(self._decode_layers_outputs[-1], tf.transpose(mat)), bias))
                 self._decode_layers_outputs.append(prob)
 
@@ -88,6 +88,9 @@ class AutoEncoder:
         code_layer_idx = len(self.layers_conf) // 2 + 1
         return session.run(self._layers_outputs[code_layer_idx], feed_dict={
             self.inputs: examples})
+
+    def encode_decode(self, session, examples):
+        return session.run(self._layers_outputs[-1], feed_dict={self.inputs: examples})
 
     def decode(self, session, examples):
         return session.run(self._decode_layers_outputs[-1], feed_dict={self.input_codes: examples})
