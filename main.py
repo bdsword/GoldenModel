@@ -44,6 +44,7 @@ def main(_):
             if i % 1000 == 0:
                 acc = dnn.get_accuracy(sess, test_examples, test_labels)
                 print('# accuracy: ', acc)
+                dnn.save_model(sess, 'model/dnn_step_{}'.format(i))
 
 if __name__ == '__main__':
     tf.app.run()
